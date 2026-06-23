@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alke Wallet - Enviar Dinero</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f7f6; min-height: 100vh; }
+        .main-card { border-radius: 24px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.08); background: white; padding: 2rem; }
+        .header-icon { width: 60px; height: 60px; background-color: #fce7f3; color: #be185d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem; }
+        .contacto-item { cursor: pointer; transition: all 0.2s; border-radius: 16px; margin-bottom: 0.5rem; border: 1px solid transparent; background: #f8fafc; padding: 1rem; display: flex; align-items: center; gap: 15px; }
+        .contacto-item:hover { background-color: #f1f5f9; transform: translateX(5px); }
+        .contacto-item.active { background-color: #fff1f2; border-color: #fda4af; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(45deg, #be185d, #f43f5e); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+        .search-input { border-radius: 20px; background-color: #f1f5f9; border: none; padding-left: 2.5rem; }
+        .search-wrapper { position: relative; }
+        .search-wrapper .bi-search { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .btn-custom { background: linear-gradient(45deg, #be185d, #e11d48); border: none; transition: transform 0.2s, box-shadow 0.2s; }
+        .btn-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(225, 29, 72, 0.3); }
+        .amount-input { font-size: 2rem !important; font-weight: 700; text-align: center; border: none; border-bottom: 2px solid #e2e8f0; border-radius: 0; padding: 0; box-shadow: none !important; background: transparent; }
+        .amount-input:focus { border-bottom-color: #be185d; }
+    </style>
+</head>
+<body class="d-flex align-items-center py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-5">
+                <div class="main-card position-relative">
+                    <a href="menu.html" class="position-absolute top-0 start-0 mt-4 ms-4 text-secondary fs-4"><i class="bi bi-arrow-left"></i></a>
+                    
+                    <div class="text-center mb-4 mt-2">
+                        <div class="header-icon"><i class="bi bi-send-fill"></i></div>
+                        <h3 class="fw-bold">Enviar Dinero</h3>
+                    </div>
+                    
+                    <div id="alert-container"></div>
+
+                    <div class="search-wrapper mb-4">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="buscadorContactos" class="form-control form-control-lg search-input shadow-none" placeholder="Buscar por nombre o alias...">
+                    </div>
+
+                    <div id="listaContactos" class="mb-4" style="max-height: 250px; overflow-y: auto;"></div>
+
+                    <form id="formEnviar" class="mb-4 d-none">
+                        <div class="text-center mb-4">
+                            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill mb-3">Enviando a <span id="destinatarioSeleccionado" class="text-dark fw-bold"></span></span>
+                            <div class="d-flex align-items-center justify-content-center gap-1">
+                                <span class="fs-3 fw-bold text-secondary">$</span>
+                                <input type="number" id="montoEnvio" class="form-control amount-input w-50" min="1" placeholder="0" required>
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-enviar-dinero" class="btn btn-custom text-white w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm">Transferir Ahora</button>
+                    </form>
+
+                    <button type="button" id="btn-mostrar-form" class="btn btn-light text-dark border w-100 mb-2 py-3 rounded-pill fw-bold"><i class="bi bi-person-plus-fill me-2 text-primary"></i>Agregar Nuevo Contacto</button>
+                    
+                    <div id="contenedor-nuevo-contacto" class="card border-0 bg-light rounded-4 p-3 mb-3 d-none">
+                        <h6 class="mb-3 fw-bold text-center text-primary">Nuevo Destinatario</h6>
+                        <form id="formNuevoContacto">
+                            <div class="mb-2">
+                                <input type="text" id="nuevoNombre" class="form-control border-0 shadow-sm" placeholder="Nombre completo" required>
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" id="nuevoCbu" class="form-control border-0 shadow-sm" placeholder="CBU/CVU (22 dígitos)" required pattern="[0-9]{22}">
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" id="nuevoAlias" class="form-control border-0 shadow-sm" placeholder="Alias" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" id="nuevoBanco" class="form-control border-0 shadow-sm" placeholder="Banco de destino" required>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" id="btn-cancelar-contacto" class="btn btn-secondary w-50 rounded-pill fw-bold border-0">Cancelar</button>
+                                <button type="submit" class="btn btn-primary w-50 rounded-pill fw-bold border-0">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let contactoSeleccionado = '';
+            let contactos = JSON.parse(localStorage.getItem('contacts') || '[]');
+
+            function getInitials(name) {
+                return name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+            }
+
+            function renderContactos() {
+                $('#listaContactos').empty();
+                contactos.forEach(c => {
+                    const item = `
+                    <div class="contacto-item" data-nombre="${c.nombre}">
+                        <div class="avatar shadow-sm">${getInitials(c.nombre)}</div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold text-dark lh-1">${c.nombre}</div>
+                            <small class="text-secondary opacity-75">${c.alias} • ${c.banco || ''}</small>
+                        </div>
+                        <i class="bi bi-chevron-right text-black-50"></i>
+                    </div>`;
+                    $('#listaContactos').append(item);
+                });
+            }
+
+            renderContactos();
+
+            $('#btn-mostrar-form').click(function() {
+                $('#contenedor-nuevo-contacto').removeClass('d-none').hide().slideDown();
+                $(this).slideUp();
+            });
+
+            $('#btn-cancelar-contacto').click(function() {
+                $('#contenedor-nuevo-contacto').slideUp(function() { $(this).addClass('d-none'); });
+                $('#btn-mostrar-form').slideDown();
+                $('#formNuevoContacto')[0].reset();
+            });
+
+            $('#formNuevoContacto').submit(function(e) {
+                e.preventDefault();
+                const nombre = $('#nuevoNombre').val();
+                const cbu = $('#nuevoCbu').val();
+                const alias = $('#nuevoAlias').val();
+                const banco = $('#nuevoBanco').val();
+
+                if (cbu.length !== 22 || isNaN(cbu)) {
+                    alert('El CBU/CVU debe contener exactamente 22 números.');
+                    return;
+                }
+
+                contactos.push({ nombre, cbu, alias, banco });
+                localStorage.setItem('contacts', JSON.stringify(contactos));
+                
+                renderContactos();
+                $('#btn-cancelar-contacto').click();
+            });
+
+            $('#buscadorContactos').on('input', function() {
+                const termino = $(this).val().toLowerCase();
+                $('.contacto-item').each(function() {
+                    const texto = $(this).text().toLowerCase();
+                    $(this).toggle(texto.includes(termino));
+                });
+            });
+
+            $('#listaContactos').on('click', '.contacto-item', function() {
+                $('.contacto-item').removeClass('active');
+                $(this).addClass('active');
+                contactoSeleccionado = $(this).data('nombre');
+                
+                $('#destinatarioSeleccionado').text(contactoSeleccionado);
+                $('#formEnviar').removeClass('d-none').hide().fadeIn();
+            });
+
+            $('#formEnviar').submit(function(e) {
+                e.preventDefault();
+                if (!contactoSeleccionado) return;
+
+                const amount = parseFloat($('#montoEnvio').val());
+                let balance = parseFloat(localStorage.getItem('balance') || 0);
+
+                if (amount > balance) {
+                    $('#alert-container').html('<div class="alert alert-danger rounded-3 fw-bold border-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Saldo insuficiente.</div>');
+                    return;
+                }
+
+                balance -= amount;
+                localStorage.setItem('balance', balance);
+
+                let txs = JSON.parse(localStorage.getItem('transactions') || '[]');
+                txs.unshift({
+                    tipo: 'transferencia',
+                    detalle: 'Transferencia a ' + contactoSeleccionado,
+                    fecha: new Date().toLocaleDateString('es-CL'),
+                    monto: -Math.abs(amount)
+                });
+                localStorage.setItem('transactions', JSON.stringify(txs));
+
+                $('#alert-container').html(`<div class="alert alert-success rounded-3 fw-bold border-0"><i class="bi bi-check-circle-fill me-2"></i>Transferencia exitosa.</div>`);
+                $('#btn-enviar-dinero').prop('disabled', true);
+                
+                setTimeout(function() { window.location.href = 'menu.html'; }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

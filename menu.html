@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alke Wallet - Menú</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f7f6; min-height: 100vh; }
+        .main-card { border-radius: 24px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.08); background: white; padding: 2rem; }
+        .credit-card { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: white; border-radius: 20px; padding: 2rem; position: relative; overflow: hidden; box-shadow: 0 15px 25px rgba(0,0,0,0.2); }
+        .credit-card::after { content: ''; position: absolute; top: -50%; right: -20%; width: 300px; height: 300px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+        .action-btn { border-radius: 16px; padding: 1.5rem; transition: all 0.3s; border: none; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+        .btn-deposit { background-color: #e0f2fe; color: #0284c7; }
+        .btn-deposit:hover { background-color: #bae6fd; transform: translateY(-5px); }
+        .btn-send { background-color: #fce7f3; color: #be185d; }
+        .btn-send:hover { background-color: #fbcfe8; transform: translateY(-5px); }
+        .btn-history { background-color: #f3f4f6; color: #374151; }
+        .btn-history:hover { background-color: #e5e7eb; transform: translateY(-5px); }
+        .icon-large { font-size: 2rem; }
+    </style>
+</head>
+<body class="d-flex align-items-center py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-5">
+                <div class="main-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold m-0"><i class="bi bi-wallet2 text-primary me-2"></i>Alke Wallet</h4>
+                        <a href="login.html" class="btn btn-light btn-sm rounded-pill text-danger"><i class="bi bi-box-arrow-right"></i> Salir</a>
+                    </div>
+                    
+                    <div id="redirect-alert" class="alert alert-primary d-none text-center rounded-pill fw-semibold shadow-sm" role="alert"></div>
+                    
+                    <div class="credit-card mb-4">
+                        <p class="mb-1 text-white-50 fw-semibold text-uppercase tracking-wider">Saldo Disponible</p>
+                        <h1 class="display-4 fw-bold mb-4" id="saldoActual">$0</h1>
+                        <div class="d-flex justify-content-between align-items-end">
+                            <span class="text-white-50"><i class="bi bi-sim text-white opacity-75 fs-3"></i></span>
+                            <span class="fw-bold tracking-widest">**** **** **** 4242</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <button data-target="deposit.html" data-name="Depositar" class="w-100 action-btn btn-deposit nav-btn">
+                                <i class="bi bi-arrow-down-circle icon-large"></i>
+                                Depositar
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button data-target="sendmoney.html" data-name="Enviar Dinero" class="w-100 action-btn btn-send nav-btn">
+                                <i class="bi bi-send icon-large"></i>
+                                Enviar
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <button data-target="transactions.html" data-name="Últimos Movimientos" class="w-100 action-btn btn-history nav-btn flex-row">
+                                <i class="bi bi-clock-history icon-large me-2"></i>
+                                Historial de Transacciones
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            if (!localStorage.getItem('alkeWalletInit')) {
+                localStorage.setItem('balance', '150000');
+                localStorage.setItem('transactions', JSON.stringify([
+                    { tipo: 'transferencia', detalle: 'Transferencia enviada a Carlos', fecha: '18/06/2026', monto: -15000 },
+                    { tipo: 'deposito', detalle: 'Depósito inicial', fecha: '15/06/2026', monto: 50000 }
+                ]));
+                localStorage.setItem('contacts', JSON.stringify([
+                    { nombre: 'Carlos Gomez', cbu: '1111111111111111111111', alias: 'carlitos.pago', banco: 'Banco Estado' },
+                    { nombre: 'Maria Lopez', cbu: '2222222222222222222222', alias: 'mary.lopez.ok', banco: 'Banco Santander' }
+                ]));
+                localStorage.setItem('alkeWalletInit', 'true');
+            }
+
+            const currentBalance = parseFloat(localStorage.getItem('balance'));
+            $('#saldoActual').text('$' + currentBalance.toLocaleString('es-CL'));
+
+            $('.nav-btn').click(function() {
+                const targetUrl = $(this).data('target');
+                const pageName = $(this).data('name');
+                
+                $('#redirect-alert').html(`<i class="bi bi-arrow-repeat spin"></i> Redirigiendo a ${pageName}...`).removeClass('d-none');
+                
+                setTimeout(function() {
+                    window.location.href = targetUrl;
+                }, 600);
+            });
+        });
+    </script>
+</body>
+</html>
